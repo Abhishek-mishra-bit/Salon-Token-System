@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Anamika",
+    "phone": "1234567890",
+    "service": "Haircut",
+    "id": 1,
+    "status": "skipped"
+  },
+  {
+    "name": "Anamika",
+    "phone": "1234567890",
+    "service": "Haircut",
+    "id": 2,
+    "status": "skipped"
+  },
+  {
+    "name": "Anamika",
+    "phone": "1234567890",
+    "service": "Haircut",
+    "id": 3,
+    "status": "skipped"
+  }
+]

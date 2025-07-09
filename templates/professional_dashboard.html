@@ -399,12 +399,12 @@
         <div class="dashboard">
             <div class="token-display">
                 <div class="current-label">CURRENTLY SERVING</div>
-                <div class="token-number pulse">22</div>
-                <div class="token-status">In Progress: Haircut</div>
+                <div class="token-number">--</div>
+                <div class="token-status">No active token</div>
                 
                 <div class="token-controls">
                     <button class="control-btn complete-btn" id="completeBtn">
-                        <i class="fas fa-check-circle"></i> Complete Service
+                        <i class="fas fa-play-circle"></i> Start Serving
                     </button>
                     <button class="control-btn skip-btn" id="skipBtn">
                         <i class="fas fa-forward"></i> Skip Customer
@@ -464,37 +464,35 @@
         </button>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Current time and date
-            function updateDateTime() {
-                const now = new Date();
-                const timeOptions = { hour: '2-digit', minute: '2-digit' };
-                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                
-                document.getElementById('time').textContent = now.toLocaleTimeString('en-US', timeOptions);
-                document.getElementById('date').textContent = now.toLocaleDateString('en-US', dateOptions);
-            }
-            
-            updateDateTime();
-            setInterval(updateDateTime, 60000);
-            
-           // DOM Elements
+    // Replace the entire script section with this fixed version
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ... existing datetime code ...
+
+        // DOM Elements
         const queueList = document.getElementById('queueList');
         const notification = document.getElementById('notification');
         const notificationText = document.getElementById('notificationText');
         const closeNotification = document.getElementById('closeNotification');
+        const completeBtn = document.getElementById('completeBtn');
+        const skipBtn = document.getElementById('skipBtn');
+        const tokenNumberElement = document.querySelector('.token-number');
+        const tokenStatusElement = document.querySelector('.token-status');
         
         let currentTokenId = null;
+        let queueDataGlobal = [];
         
         // Render queue list
         function renderQueue(queueData) {
             queueList.innerHTML = '';
+            queueDataGlobal = queueData;
             
             // Filter out completed/skipped tokens
             const activeQueue = queueData.filter(customer => 
                 customer.status !== 'completed' && customer.status !== 'skipped'
             );
+            
+            let hasActiveToken = false;
             
             activeQueue.forEach(customer => {
                 const item = document.createElement('div');
@@ -520,10 +518,22 @@
                 // Set current token if active
                 if (customer.status === 'active') {
                     currentTokenId = customer.id;
-                    document.querySelector('.token-number').textContent = customer.id;
-                    document.querySelector('.token-status').textContent = `In Progress: ${customer.service}`;
+                    tokenNumberElement.textContent = customer.id;
+                    tokenStatusElement.textContent = `In Progress: ${customer.service}`;
+                    hasActiveToken = true;
+                    // Update button to "Complete Service"
+                    completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> Complete Service';
                 }
             });
+            
+            // If no active token, reset display
+            if (!hasActiveToken) {
+                tokenNumberElement.textContent = '--';
+                tokenStatusElement.textContent = 'No active token';
+                currentTokenId = null;
+                // Update button to "Start Serving"
+                completeBtn.innerHTML = '<i class="fas fa-play-circle"></i> Start Serving';
+            }
             
             // Add event listeners to notify buttons
             document.querySelectorAll('.notify-customer').forEach(button => {
@@ -566,147 +576,131 @@
             .then(response => response.json());
         }
         
+        // Start serving first customer
+        function startServingFirstToken() {
+            if (queueDataGlobal.length === 0) {
+                showNotification('No customers in queue');
+                return;
+            }
+            
+            // Find first waiting customer
+            const waitingQueue = queueDataGlobal
+                .filter(c => c.status === 'waiting')
+                .sort((a, b) => a.id - b.id);
+            
+            if (waitingQueue.length === 0) {
+                showNotification('No customers waiting');
+                return;
+            }
+            
+            const firstToken = waitingQueue[0];
+            
+            updateTokenStatus(firstToken.id, 'active')
+            .then(() => {
+                fetchQueue();
+                showNotification(`Started serving token ${firstToken.id}`);
+            })
+            .catch(error => {
+                console.error('Error starting service:', error);
+                showNotification('Failed to start serving');
+            });
+        }
+        
         // Complete current token
         function completeCurrentToken() {
-            if (!currentTokenId) return;
+            if (!currentTokenId) {
+                showNotification('No active token to complete');
+                return;
+            }
             
             updateTokenStatus(currentTokenId, 'completed')
             .then(() => {
-                // Find next token to activate
+                // After completing, set next token as active
                 fetch('/api/queue')
                 .then(response => response.json())
                 .then(queueData => {
-                    // Find next waiting token
-                    const nextToken = queueData.find(c => 
-                        c.status === 'next' || 
-                        (c.status === 'waiting' && c.id > currentTokenId)
-                    );
+                    const waitingQueue = queueData
+                        .filter(c => c.status === 'waiting')
+                        .sort((a, b) => a.id - b.id);
                     
-                    if (nextToken) {
-                        // Activate next token
-                        return updateTokenStatus(nextToken.id, 'active');
+                    if (waitingQueue.length > 0) {
+                        return updateTokenStatus(waitingQueue[0].id, 'active');
                     }
                 })
                 .then(() => {
                     fetchQueue();
                     showNotification('Service completed. Next customer notified.');
                 });
+            })
+            .catch(error => {
+                console.error('Error completing token:', error);
+                showNotification('Failed to complete token');
             });
         }
         
         // Skip current token
         function skipCurrentToken() {
-            if (!currentTokenId) return;
+            if (!currentTokenId) {
+                showNotification('No active token to skip');
+                return;
+            }
             
             updateTokenStatus(currentTokenId, 'skipped')
             .then(() => {
-                // Find next token to activate
+                // After skipping, set next token as active
                 fetch('/api/queue')
                 .then(response => response.json())
                 .then(queueData => {
-                    // Find next waiting token
-                    const nextToken = queueData.find(c => 
-                        c.status === 'next' || 
-                        (c.status === 'waiting' && c.id > currentTokenId)
-                    );
+                    const waitingQueue = queueData
+                        .filter(c => c.status === 'waiting')
+                        .sort((a, b) => a.id - b.id);
                     
-                    if (nextToken) {
-                        // Activate next token
-                        return updateTokenStatus(nextToken.id, 'active');
+                    if (waitingQueue.length > 0) {
+                        return updateTokenStatus(waitingQueue[0].id, 'active');
                     }
                 })
                 .then(() => {
                     fetchQueue();
                     showNotification('Customer skipped. Next customer notified.');
                 });
+            })
+            .catch(error => {
+                console.error('Error skipping token:', error);
+                showNotification('Failed to skip token');
             });
         }
-            renderQueue();
+        
+        // Show notification
+        function showNotification(message) {
+            notificationText.textContent = message;
+            notification.classList.add('show');
             
-            // Notification system     
-            
-            function showNotification(message) {
-                notificationText.textContent = message;
-                notification.classList.add('show');
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 5000);
-            }
-            
-            closeNotification.addEventListener('click', function() {
-                notification.classList.remove('show');
-            });
-            
-            // Complete button functionality
-            document.getElementById('completeBtn').addEventListener('click', function() {
-                const currentToken = document.querySelector('.token-number');
-                const currentValue = parseInt(currentToken.textContent);
-                
-                // Update to next token
-                currentToken.textContent = currentValue + 1;
-                currentToken.classList.add('pulse');
-                
-                // Update queue status
-                queueData.forEach(customer => {
-                    if (customer.status === 'active') customer.status = 'completed';
-                    if (customer.status === 'next') customer.status = 'active';
-                    if (customer.id === currentValue + 2) customer.status = 'next';
-                });
-                
-                renderQueue();
-                
-                // Notify next customer
-                const nextCustomer = queueData.find(c => c.id === currentValue + 1);
-                if (nextCustomer) {
-                    showNotification(`Token ${nextCustomer.id} (${nextCustomer.name}) is now active`);
-                }
-                
-                // Remove pulse animation after 1 second
-                setTimeout(() => {
-                    currentToken.classList.remove('pulse');
-                }, 1000);
-            });
-            
-            // Skip button functionality
-            document.getElementById('skipBtn').addEventListener('click', function() {
-                const currentToken = document.querySelector('.token-number');
-                const currentValue = parseInt(currentToken.textContent);
-                
-                // Update to next token
-                currentToken.textContent = currentValue + 1;
-                currentToken.classList.add('pulse');
-                
-                // Update queue status
-                queueData.forEach(customer => {
-                    if (customer.status === 'active') customer.status = 'skipped';
-                    if (customer.status === 'next') customer.status = 'active';
-                    if (customer.id === currentValue + 2) customer.status = 'next';
-                });
-                
-                renderQueue();
-                
-                // Notify next customer
-                const nextCustomer = queueData.find(c => c.id === currentValue + 1);
-                if (nextCustomer) {
-                    showNotification(`Token ${nextCustomer.id} (${nextCustomer.name}) is now active (Skipped token ${currentValue})`);
-                }
-                
-                // Remove pulse animation after 1 second
-                setTimeout(() => {
-                    currentToken.classList.remove('pulse');
-                }, 1000);
-            });
-            
-            // Auto-notify next customer when token 22 is active
             setTimeout(() => {
-                const nextCustomer = queueData.find(c => c.id === 23);
-                if (nextCustomer) {
-                    showNotification(`Token 23 (${nextCustomer.name}) has been notified`);
-                    console.log(`Sending SMS to ${nextCustomer.phone}: Your token 23 will be called soon. Please be ready.`);
-                }
-            }, 3000);
+                notification.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Event listeners
+        closeNotification.addEventListener('click', function() {
+            notification.classList.remove('show');
         });
-    </script>
+        
+        completeBtn.addEventListener('click', function() {
+            if (this.innerHTML.includes('Start Serving')) {
+                startServingFirstToken();
+            } else {
+                completeCurrentToken();
+            }
+        });
+        
+        skipBtn.addEventListener('click', skipCurrentToken);
+        
+        // Initial fetch
+        fetchQueue();
+        
+        // Periodically update queue
+        setInterval(fetchQueue, 10000);
+    });
+</script>
 </body>
 </html>

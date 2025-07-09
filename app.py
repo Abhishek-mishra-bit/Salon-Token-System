@@ -26,8 +26,14 @@ def save_users(data):
         json.dump(data, f, indent=2)
 
 def load_queue():
-    with open(QUEUE_DB) as f:
-        return json.load(f)
+    try:
+        with open(QUEUE_DB) as f:
+            return json.load(f)
+    except (json.JSONDecodeError, ValueError):
+        # If file is empty or invalid, re-initialize
+        with open(QUEUE_DB, 'w') as f:
+            json.dump([], f)
+        return []
 
 def save_queue(data):
     with open(QUEUE_DB, "w") as f:
