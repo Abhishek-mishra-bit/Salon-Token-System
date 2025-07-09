@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .form-container {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a2a6c;
+            font-size: 1.05rem;
+        }
+        
+        .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+        
+        .input-container {
+            position: relative;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 15px 50px 15px 15px;
+            border: 2px solid #e1e5ee;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: #1a2a6c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.2);
+            background: white;
+        }
+        
+        input::placeholder {
+            color: #a0aec0;
+        }
+        
+        .icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+            font-size: 18px;
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #a0aec0;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(to right, #233380, #c72525);
+        }
+        
+        .form-footer {
+            text-align: center;
+            padding: 20px;
+            color: #718096;
+            font-size: 0.95rem;
+            border-top: 1px solid #e1e5ee;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .form-footer a {
+            color: #1a2a6c;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .options {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .remember input {
+            width: auto;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e1e5ee;
+        }
+        
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 20px;
+            color: #4a5568;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .facebook { color: #1877f2; }
+        .google { color: #ea4335; }
+        .linkedin { color: #0a66c2; }
+        
+        .notification {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .country-code {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #1a2a6c;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .mobile-input {
+            padding-left: 55px !important;
+        }
+        
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 28px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .submit-group { animation: fadeIn 0.3s ease forwards; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-building"></i>
+            </div>
+            <h1><i class="fas fa-sign-in-alt"></i> Business Login</h1>
+            <p>Access your business account</p>
+        </div>
+        
+        <form class="form-container" id="loginForm" method="POST" action="/login">
+            <div class="notification success" id="successNotification">
+                Login successful! Redirecting to your dashboard...
+            </div>
+            
+            <div class="notification error" id="errorNotification">
+                Invalid credentials. Please try again.
+            </div>
+            
+            <div class="form-group">
+                <label for="mobile" class="required">Mobile Number</label>
+                <div class="input-container">
+                    <span class="country-code">+1</span>
+                    <input type="tel" id="mobile" name="mobile" class="mobile-input" placeholder="Enter your mobile number" required>
+                    <i class="fas fa-phone icon"></i>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password" class="required">Password</label>
+                <div class="input-container">
+                    <div class="password-container">
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="options">
+                <div class="remember">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Remember me</label>
+                </div>
+                <a href="#">Forgot Password?</a>
+            </div>
+            
+            <div class="form-group submit-group">
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-lock"></i> Login to Account
+                </button>
+            </div>
+            
+            <div class="divider">
+                <span>or continue with</span>
+            </div>
+            
+            <div class="social-login">
+                <button class="social-btn facebook" type="button">
+                    <i class="fab fa-facebook-f"></i>
+                </button>
+                <button class="social-btn google" type="button">
+                    <i class="fab fa-google"></i>
+                </button>
+                <button class="social-btn linkedin" type="button">
+                    <i class="fab fa-linkedin-in"></i>
+                </button>
+            </div>
+        </form>
+        
+        <div class="form-footer">
+            <p>Don't have an account? <a href="#">Register your business</a></p>
+            <p>By logging in, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle password visibility
+            const togglePassword = document.getElementById('togglePassword');
+            const password = document.getElementById('password');
+            
+            togglePassword.addEventListener('click', function() {
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            });
+            
+            // Form validation
+            const form = document.getElementById('loginForm');
+            const successNotification = document.getElementById('successNotification');
+            const errorNotification = document.getElementById('errorNotification');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Hide notifications
+                successNotification.style.display = 'none';
+                errorNotification.style.display = 'none';
+                
+                // Get form values
+                const mobile = document.getElementById('mobile').value;
+                const password = document.getElementById('password').value;
+                
+                // Simple validation
+                if (!mobile || mobile.length < 10) {
+                    showError('Please enter a valid mobile number');
+                    return;
+                }
+                
+                if (!password || password.length < 6) {
+                    showError('Password must be at least 6 characters');
+                    return;
+                }
+                
+                // Simulate successful login
+                showSuccess();
+                
+                // In a real application, you would make an API call here
+                setTimeout(() => {
+                    window.location.href = '/professional_dashboard';
+                }, 2000);
+            });
+            
+            function showError(message) {
+                errorNotification.textContent = message;
+                errorNotification.style.display = 'block';
+            }
+            
+            function showSuccess() {
+                successNotification.style.display = 'block';
+            }
+            
+            // Simulate country code selector
+            const countryCode = document.querySelector('.country-code');
+            countryCode.addEventListener('click', function() {
+                alert('Country code selector would appear here in a production application');
+            });
+        });
+    </script>
+</body>
+</html>

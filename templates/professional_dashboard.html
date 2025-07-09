@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salon Booking Token System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            color: white;
+            padding: 25px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 2.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-text h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .logo-text p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .current-time {
+            font-size: 1.2rem;
+            font-weight: 500;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            padding: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .token-display {
+            background: linear-gradient(135deg, #2c3e50, #4a6491);
+            border-radius: 15px;
+            padding: 30px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .current-label {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #f8f9fa;
+            opacity: 0.9;
+        }
+        
+        .token-number {
+            font-size: 6rem;
+            font-weight: 700;
+            margin: 20px 0;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .token-status {
+            font-size: 1.4rem;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        
+        .token-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .control-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .complete-btn {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            color: white;
+        }
+        
+        .complete-btn:hover {
+            background: linear-gradient(to right, #27ae60, #219653);
+            transform: translateY(-3px);
+        }
+        
+        .skip-btn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .skip-btn:hover {
+            background: linear-gradient(to right, #c0392b, #a93226);
+            transform: translateY(-3px);
+        }
+        
+        .queue-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-title {
+            color: #1a2a6c;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e1e5ee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .queue-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .queue-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #1a2a6c;
+            transition: all 0.3s ease;
+        }
+        
+        .queue-item.next {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .queue-item.active {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .token-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .token-badge {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #1a2a6c;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        
+        .next .token-badge {
+            background: #2196f3;
+        }
+        
+        .active .token-badge {
+            background: #4caf50;
+        }
+        
+        .token-details h3 {
+            font-size: 1.2rem;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .token-details p {
+            color: #718096;
+            font-size: 0.95rem;
+        }
+        
+        .token-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .notify-btn {
+            background: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .notify-btn:hover {
+            background: #e68a00;
+        }
+        
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #e3f2fd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.5rem;
+            color: #1a2a6c;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a2a6c;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #718096;
+            font-size: 1rem;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #718096;
+            font-size: 0.95rem;
+            border-top: 1px solid #e1e5ee;
+            background: #f8f9fa;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateX(120%);
+            transition: transform 0.5s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #4caf50;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .notification-content h3 {
+            margin-bottom: 5px;
+            color: #2d3748;
+        }
+        
+        .notification-content p {
+            color: #718096;
+            font-size: 0.95rem;
+        }
+        
+        .close-notification {
+            background: none;
+            border: none;
+            color: #a0aec0;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .token-number.pulse {
+            animation: pulse 1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-cut"></i>
+                <div class="logo-text">
+                    <h1>Salon Token System</h1>
+                    <p>Professional Booking Management</p>
+                </div>
+            </div>
+            <div class="current-time">
+                <i class="fas fa-clock"></i> <span id="time">10:30 AM</span> | 
+                <span id="date">July 10, 2025</span>
+            </div>
+        </div>
+        
+        <div class="dashboard">
+            <div class="token-display">
+                <div class="current-label">CURRENTLY SERVING</div>
+                <div class="token-number pulse">22</div>
+                <div class="token-status">In Progress: Haircut</div>
+                
+                <div class="token-controls">
+                    <button class="control-btn complete-btn" id="completeBtn">
+                        <i class="fas fa-check-circle"></i> Complete Service
+                    </button>
+                    <button class="control-btn skip-btn" id="skipBtn">
+                        <i class="fas fa-forward"></i> Skip Customer
+                    </button>
+                </div>
+            </div>
+            
+            <div class="queue-section">
+                <h2 class="section-title"><i class="fas fa-list-ol"></i> Waiting Queue</h2>
+                <div class="queue-list" id="queueList">
+                    <!-- Queue items will be added dynamically -->
+                </div>
+                
+                <div class="stats-section">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Customers Today</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-value">15 min</div>
+                        <div class="stat-label">Avg. Wait Time</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">Currently Waiting</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Salon Token System &copy; 2025 | Real-time Customer Management</p>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <div class="notification-icon">
+            <i class="fas fa-bell"></i>
+        </div>
+        <div class="notification-content">
+            <h3>Notification Sent</h3>
+            <p id="notificationText">Token 23 has been notified</p>
+        </div>
+        <button class="close-notification" id="closeNotification">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Current time and date
+            function updateDateTime() {
+                const now = new Date();
+                const timeOptions = { hour: '2-digit', minute: '2-digit' };
+                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                
+                document.getElementById('time').textContent = now.toLocaleTimeString('en-US', timeOptions);
+                document.getElementById('date').textContent = now.toLocaleDateString('en-US', dateOptions);
+            }
+            
+            updateDateTime();
+            setInterval(updateDateTime, 60000);
+            
+           // DOM Elements
+        const queueList = document.getElementById('queueList');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        const closeNotification = document.getElementById('closeNotification');
+        
+        let currentTokenId = null;
+        
+        // Render queue list
+        function renderQueue(queueData) {
+            queueList.innerHTML = '';
+            
+            // Filter out completed/skipped tokens
+            const activeQueue = queueData.filter(customer => 
+                customer.status !== 'completed' && customer.status !== 'skipped'
+            );
+            
+            activeQueue.forEach(customer => {
+                const item = document.createElement('div');
+                item.className = `queue-item ${customer.status}`;
+                
+                item.innerHTML = `
+                    <div class="token-info">
+                        <div class="token-badge">${customer.id}</div>
+                        <div class="token-details">
+                            <h3>${customer.name}</h3>
+                            <p>${customer.service} • ${customer.phone}</p>
+                        </div>
+                    </div>
+                    <div class="token-actions">
+                        <button class="notify-btn notify-customer" data-id="${customer.id}">
+                            <i class="fas fa-bell"></i> Notify
+                        </button>
+                    </div>
+                `;
+                
+                queueList.appendChild(item);
+                
+                // Set current token if active
+                if (customer.status === 'active') {
+                    currentTokenId = customer.id;
+                    document.querySelector('.token-number').textContent = customer.id;
+                    document.querySelector('.token-status').textContent = `In Progress: ${customer.service}`;
+                }
+            });
+            
+            // Add event listeners to notify buttons
+            document.querySelectorAll('.notify-customer').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const customer = activeQueue.find(c => c.id == id);
+                    
+                    if (customer) {
+                        showNotification(`Notification sent to token ${id} (${customer.name})`);
+                        console.log(`Sending SMS to ${customer.phone}: Your token ${id} will be called soon.`);
+                    }
+                });
+            });
+        }
+        
+        // Fetch queue from backend
+        function fetchQueue() {
+            fetch('/api/queue')
+            .then(response => response.json())
+            .then(queueData => {
+                renderQueue(queueData);
+            })
+            .catch(error => {
+                console.error('Error fetching queue:', error);
+            });
+        }
+        
+        // Update token status
+        function updateTokenStatus(tokenId, status) {
+            return fetch('/api/queue/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: tokenId,
+                    status: status
+                })
+            })
+            .then(response => response.json());
+        }
+        
+        // Complete current token
+        function completeCurrentToken() {
+            if (!currentTokenId) return;
+            
+            updateTokenStatus(currentTokenId, 'completed')
+            .then(() => {
+                // Find next token to activate
+                fetch('/api/queue')
+                .then(response => response.json())
+                .then(queueData => {
+                    // Find next waiting token
+                    const nextToken = queueData.find(c => 
+                        c.status === 'next' || 
+                        (c.status === 'waiting' && c.id > currentTokenId)
+                    );
+                    
+                    if (nextToken) {
+                        // Activate next token
+                        return updateTokenStatus(nextToken.id, 'active');
+                    }
+                })
+                .then(() => {
+                    fetchQueue();
+                    showNotification('Service completed. Next customer notified.');
+                });
+            });
+        }
+        
+        // Skip current token
+        function skipCurrentToken() {
+            if (!currentTokenId) return;
+            
+            updateTokenStatus(currentTokenId, 'skipped')
+            .then(() => {
+                // Find next token to activate
+                fetch('/api/queue')
+                .then(response => response.json())
+                .then(queueData => {
+                    // Find next waiting token
+                    const nextToken = queueData.find(c => 
+                        c.status === 'next' || 
+                        (c.status === 'waiting' && c.id > currentTokenId)
+                    );
+                    
+                    if (nextToken) {
+                        // Activate next token
+                        return updateTokenStatus(nextToken.id, 'active');
+                    }
+                })
+                .then(() => {
+                    fetchQueue();
+                    showNotification('Customer skipped. Next customer notified.');
+                });
+            });
+        }
+            renderQueue();
+            
+            // Notification system     
+            
+            function showNotification(message) {
+                notificationText.textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 5000);
+            }
+            
+            closeNotification.addEventListener('click', function() {
+                notification.classList.remove('show');
+            });
+            
+            // Complete button functionality
+            document.getElementById('completeBtn').addEventListener('click', function() {
+                const currentToken = document.querySelector('.token-number');
+                const currentValue = parseInt(currentToken.textContent);
+                
+                // Update to next token
+                currentToken.textContent = currentValue + 1;
+                currentToken.classList.add('pulse');
+                
+                // Update queue status
+                queueData.forEach(customer => {
+                    if (customer.status === 'active') customer.status = 'completed';
+                    if (customer.status === 'next') customer.status = 'active';
+                    if (customer.id === currentValue + 2) customer.status = 'next';
+                });
+                
+                renderQueue();
+                
+                // Notify next customer
+                const nextCustomer = queueData.find(c => c.id === currentValue + 1);
+                if (nextCustomer) {
+                    showNotification(`Token ${nextCustomer.id} (${nextCustomer.name}) is now active`);
+                }
+                
+                // Remove pulse animation after 1 second
+                setTimeout(() => {
+                    currentToken.classList.remove('pulse');
+                }, 1000);
+            });
+            
+            // Skip button functionality
+            document.getElementById('skipBtn').addEventListener('click', function() {
+                const currentToken = document.querySelector('.token-number');
+                const currentValue = parseInt(currentToken.textContent);
+                
+                // Update to next token
+                currentToken.textContent = currentValue + 1;
+                currentToken.classList.add('pulse');
+                
+                // Update queue status
+                queueData.forEach(customer => {
+                    if (customer.status === 'active') customer.status = 'skipped';
+                    if (customer.status === 'next') customer.status = 'active';
+                    if (customer.id === currentValue + 2) customer.status = 'next';
+                });
+                
+                renderQueue();
+                
+                // Notify next customer
+                const nextCustomer = queueData.find(c => c.id === currentValue + 1);
+                if (nextCustomer) {
+                    showNotification(`Token ${nextCustomer.id} (${nextCustomer.name}) is now active (Skipped token ${currentValue})`);
+                }
+                
+                // Remove pulse animation after 1 second
+                setTimeout(() => {
+                    currentToken.classList.remove('pulse');
+                }, 1000);
+            });
+            
+            // Auto-notify next customer when token 22 is active
+            setTimeout(() => {
+                const nextCustomer = queueData.find(c => c.id === 23);
+                if (nextCustomer) {
+                    showNotification(`Token 23 (${nextCustomer.name}) has been notified`);
+                    console.log(`Sending SMS to ${nextCustomer.phone}: Your token 23 will be called soon. Please be ready.`);
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
