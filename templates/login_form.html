@@ -339,7 +339,7 @@
                     <input type="checkbox" id="remember">
                     <label for="remember">Remember me</label>
                 </div>
-                <a href="#">Forgot Password?</a>
+                <a href="/forgot_password">Forgot Password?</a>
             </div>
             
             <div class="form-group submit-group">
@@ -366,7 +366,7 @@
         </form>
         
         <div class="form-footer">
-            <p>Don't have an account? <a href="#">Register your business</a></p>
+            <p>Don't have an account? <a href="/signup">Register your business</a></p>
             <p>By logging in, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
         </div>
     </div>
@@ -381,57 +381,6 @@
                 const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
                 password.setAttribute('type', type);
                 this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
-            });
-            
-            // Form validation
-            const form = document.getElementById('loginForm');
-            const successNotification = document.getElementById('successNotification');
-            const errorNotification = document.getElementById('errorNotification');
-            
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Hide notifications
-                successNotification.style.display = 'none';
-                errorNotification.style.display = 'none';
-                
-                // Get form values
-                const mobile = document.getElementById('mobile').value;
-                const password = document.getElementById('password').value;
-                
-                // Simple validation
-                if (!mobile || mobile.length < 10) {
-                    showError('Please enter a valid mobile number');
-                    return;
-                }
-                
-                if (!password || password.length < 6) {
-                    showError('Password must be at least 6 characters');
-                    return;
-                }
-                
-                // Simulate successful login
-                showSuccess();
-                
-                // In a real application, you would make an API call here
-                setTimeout(() => {
-                    window.location.href = '/professional_dashboard';
-                }, 2000);
-            });
-            
-            function showError(message) {
-                errorNotification.textContent = message;
-                errorNotification.style.display = 'block';
-            }
-            
-            function showSuccess() {
-                successNotification.style.display = 'block';
-            }
-            
-            // Simulate country code selector
-            const countryCode = document.querySelector('.country-code');
-            countryCode.addEventListener('click', function() {
-                alert('Country code selector would appear here in a production application');
             });
         });
     </script>

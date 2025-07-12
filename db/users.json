@@ -9,5 +9,17 @@
     "city": "mumbai",
     "password": "UttarPradesh",
     "description": "UttarPradesh"
+  },
+  {
+    "businessName": "Salon123",
+    "role": "professional",
+    "name": "Vivek verma",
+    "email": "ab@gmail.com",
+    "mobile": "7380681660",
+    "address": "UttarPradesh",
+    "city": "mumbai",
+    "password": "scrypt:32768:8:1$VJZDt3NSmmUQcbJH$bc9ca3e0edaef5a34f015eb93070695fa58656e3910a7f513f24e9d8949616e47e47a9109967d6c0c45310fb55b1f23e1ea105a3e8cb89a9ce97e2488265838e",
+    "description": "ascasccaacsaca",
+    "business_id": "c455c48b-01f8-4015-a310-5bef8c5fbdd5"
   }
 ]

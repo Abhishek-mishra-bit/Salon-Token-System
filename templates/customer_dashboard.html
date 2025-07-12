@@ -506,6 +506,13 @@
     </div>
 
     <script>
+        // Get business_id from URL parameters
+        const businessId = new URLSearchParams(window.location.search).get('business_id');
+        if (!businessId) {
+            console.error("Business ID is missing!");
+            throw new Error("Business ID is required to load the customer dashboard.");
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // Current time and date
             function updateDateTime() {
@@ -546,18 +553,16 @@
             }
             
             // Send request to backend
-            fetch('/api/queue/add', {
+            fetch(`/api/queue/add?business_id=${businessId}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
+                    business_id: businessId,
                     name: name,
                     phone: phone,
                     service: service
                 })
-            })
-            .then(response => response.json())
+            }).then(response => response.json())
             .then(data => {
                 if (data.success) {
                     myTokenId = data.id;
@@ -591,7 +596,7 @@
         function updateQueueInfo() {
             if (!myTokenId) return;
             
-            fetch('/api/queue')
+            fetch(`/api/queue?business_id=${businessId}`)
             .then(response => response.json())
             .then(queueData => {
                 // Find customer position

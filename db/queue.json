@@ -1,23 +1,30 @@
-[
-  {
-    "name": "Anamika",
-    "phone": "1234567890",
-    "service": "Haircut",
-    "id": 1,
-    "status": "skipped"
-  },
-  {
-    "name": "Anamika",
-    "phone": "1234567890",
-    "service": "Haircut",
-    "id": 2,
-    "status": "skipped"
-  },
-  {
-    "name": "Anamika",
-    "phone": "1234567890",
-    "service": "Haircut",
-    "id": 3,
-    "status": "skipped"
+{
+  "c455c48b-01f8-4015-a310-5bef8c5fbdd5": {
+    "2025-07-12": [
+      {
+        "id": 1,
+        "name": "Ana",
+        "phone": "1234567890",
+        "service": "Haircut",
+        "status": "completed",
+        "timestamp": "2025-07-12T17:22:58.186972"
+      },
+      {
+        "id": 2,
+        "name": "Ana",
+        "phone": "1234567890",
+        "service": "Haircut",
+        "status": "completed",
+        "timestamp": "2025-07-12T17:29:26.167198"
+      },
+      {
+        "id": 3,
+        "name": "Ana",
+        "phone": "1234567890",
+        "service": "Haircut",
+        "status": "completed",
+        "timestamp": "2025-07-12T18:27:33.555887"
+      }
+    ]
   }
-]
+}

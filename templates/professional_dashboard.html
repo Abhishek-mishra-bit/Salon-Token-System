@@ -368,6 +368,20 @@
             cursor: pointer;
             font-size: 1.2rem;
         }
+        .btn-logout {
+        background: #e74c3c;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        }
+
+        .btn-logout:hover {
+            background: #c0392b;
+        }
         
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -393,6 +407,11 @@
             <div class="current-time">
                 <i class="fas fa-clock"></i> <span id="time">10:30 AM</span> | 
                 <span id="date">July 10, 2025</span>
+            </div>
+             <div class="logout">
+                <a href="/logout" class="btn btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
             </div>
         </div>
         
@@ -423,7 +442,7 @@
                         <div class="stat-icon">
                             <i class="fas fa-users"></i>
                         </div>
-                        <div class="stat-value">8</div>
+                        <div class="stat-value" id="customersToday">0</div>
                         <div class="stat-label">Customers Today</div>
                     </div>
                     
@@ -431,7 +450,7 @@
                         <div class="stat-icon">
                             <i class="fas fa-clock"></i>
                         </div>
-                        <div class="stat-value">15 min</div>
+                        <div class="stat-value" id="avgWaitTime"></div>
                         <div class="stat-label">Avg. Wait Time</div>
                     </div>
                     
@@ -439,7 +458,7 @@
                         <div class="stat-icon">
                             <i class="fas fa-user-clock"></i>
                         </div>
-                        <div class="stat-value">3</div>
+                        <div class="stat-value" id="currentlyWaiting">0</div>
                         <div class="stat-label">Currently Waiting</div>
                     </div>
                 </div>
@@ -464,10 +483,24 @@
         </button>
     </div>
 
-    // Replace the entire script section with this fixed version
 <script>
+    // Get business_id from template rendering
+    const businessId = "{{ business_id }}";
+    console.log("Loaded business ID:", businessId);
+
     document.addEventListener('DOMContentLoaded', function() {
         // ... existing datetime code ...
+        function updateTime() {
+            const now = new Date();
+            const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+            const timeString = now.toLocaleTimeString('en-US', options);
+            const dateString = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            
+            document.getElementById('time').textContent = timeString;
+            document.getElementById('date').textContent = dateString;
+        }
+        updateTime();
+        setInterval(updateTime, 60000); // Update every minute
 
         // DOM Elements
         const queueList = document.getElementById('queueList');
@@ -548,22 +581,54 @@
                 });
             });
         }
+        function updateStats(queueData) {
+            const totalCustomers = queueData.length;
+            const currentlyWaiting = queueData.filter(c => c.status === 'waiting').length;
+
+            // Calculate average wait time (in minutes)
+            let totalWaitTime = 0;
+            let waitCount = 0;
+            const now = new Date();
+
+            queueData.forEach(c => {
+                if (c.status === 'waiting') {
+                    const ts = new Date(c.timestamp);
+                    const diff = Math.floor((now - ts) / 60000); // diff in minutes
+                    totalWaitTime += diff;
+                    waitCount++;
+                }
+            });
+
+            const avgWait = waitCount > 0 ? Math.round(totalWaitTime / waitCount) : '--';
+
+            document.getElementById("customersToday").textContent = totalCustomers;
+            document.getElementById("currentlyWaiting").textContent = currentlyWaiting;
+            document.getElementById("avgWaitTime").textContent = avgWait + (avgWait !== '--' ? ' min' : '');
+        }
+
         
         // Fetch queue from backend
         function fetchQueue() {
-            fetch('/api/queue')
+            if (!businessId) {
+                console.error('Business ID is not set');
+                showNotification('Business ID is not set');
+                return;
+            }
+            fetch(`/api/queue?business_id=${businessId}`)
             .then(response => response.json())
             .then(queueData => {
                 renderQueue(queueData);
+                updateStats(queueData);  // 👈 Add this
             })
             .catch(error => {
                 console.error('Error fetching queue:', error);
             });
         }
+
         
         // Update token status
         function updateTokenStatus(tokenId, status) {
-            return fetch('/api/queue/update', {
+            return fetch(`/api/queue/update?business_id=${businessId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -616,7 +681,7 @@
             updateTokenStatus(currentTokenId, 'completed')
             .then(() => {
                 // After completing, set next token as active
-                fetch('/api/queue')
+                fetch(`/api/queue?business_id=${businessId}`)
                 .then(response => response.json())
                 .then(queueData => {
                     const waitingQueue = queueData
@@ -648,7 +713,7 @@
             updateTokenStatus(currentTokenId, 'skipped')
             .then(() => {
                 // After skipping, set next token as active
-                fetch('/api/queue')
+                fetch(`/api/queue?business_id=${businessId}`)
                 .then(response => response.json())
                 .then(queueData => {
                     const waitingQueue = queueData
