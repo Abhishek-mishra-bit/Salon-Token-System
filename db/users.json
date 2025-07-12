@@ -21,5 +21,17 @@
     "password": "scrypt:32768:8:1$VJZDt3NSmmUQcbJH$bc9ca3e0edaef5a34f015eb93070695fa58656e3910a7f513f24e9d8949616e47e47a9109967d6c0c45310fb55b1f23e1ea105a3e8cb89a9ce97e2488265838e",
     "description": "ascasccaacsaca",
     "business_id": "c455c48b-01f8-4015-a310-5bef8c5fbdd5"
+  },
+  {
+    "businessName": "Arman",
+    "role": "professional",
+    "name": "Arman",
+    "email": "arman@gmail.com",
+    "mobile": "1234567890",
+    "address": "UttarPradesh",
+    "city": "Kanpur Nagar",
+    "password": "scrypt:32768:8:1$Uc7yX1eldRyhoVs2$534c5a7535d1a58961031b62071d16330ee093c650d0987770fe2c2f959a5bfbc75f97669af1998ce0c2f392117fc27f7ec9eab2bf6efed892f38997462c13f5",
+    "description": "jai ho",
+    "business_id": "18e448d1-2d5b-4604-a556-9d15010e38a9"
   }
 ]

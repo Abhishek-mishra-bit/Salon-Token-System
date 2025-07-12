@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, make_response
 import json
 import os
 import uuid
@@ -106,10 +106,7 @@ def signup():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    print("Login route accessed")
-    if request.method == 'POST':
-        print("Login attempt")
-        print("Form data:", request.form)
+    if request.method == 'POST':        
         users = load_users()
         data = request.form
         
@@ -121,11 +118,8 @@ def login():
             session['business_id'] = user['business_id']
             session['role'] = user.get('role', 'professional')
             
-            print("User authenticated:", session['user_id'])
-            print("Business ID:", session['business_id'])
-            
-            print("Redirecting to:", f"/{session['role']}_dashboard?business_id={session['business_id']}")
-            return redirect(url_for(f"{session['role']}_dashboard", business_id=session['business_id']))
+            # Redirect to dashboard using session business_id
+            return redirect(url_for(f"{session['role']}_dashboard"))
         
         # Show error message
         return render_template('login_form.html', error="Invalid credentials. Please try again.")
@@ -133,79 +127,32 @@ def login():
     return render_template('login_form.html')
 
 
-@app.route('/forgot_password', methods=['GET', 'POST'])
-def forgot_password():
-    if request.method == 'POST':
-        mobile = request.form['mobile']
-        print("Forgot password request for mobile:", mobile)
-        users = load_users()
-        
-        # Check if mobile exists
-        if any(user['mobile'] == mobile for user in users):
-            # Generate reset token (in real app, send via SMS/email)
-            reset_token = str(uuid.uuid4())
-            expires = (datetime.now() + timedelta(hours=1)).isoformat()
-            
-            # Save reset token
-            resets = load_password_resets()
-            resets.append({
-                'mobile': mobile,
-                'token': reset_token,
-                'expires': expires
-            })
-            save_password_resets(resets)
-            
-            # Show reset token to user (in production, send via SMS/email)
-            return render_template('reset_password.html', mobile=mobile, token=reset_token)
-        
-        return render_template('forgot_password.html', error="Mobile number not found")
-    
-    return render_template('forgot_password.html')
-
-@app.route('/reset_password', methods=['GET', 'POST'])
-def reset_password():
-    if request.method == 'POST':
-        mobile = request.form['mobile']
-        token = request.form['token']
-        new_password = request.form['password']
-        
-        # Validate token
-        resets = load_password_resets()
-        valid_reset = None
-        
-        for reset in resets:
-            if reset['mobile'] == mobile and reset['token'] == token:
-                if datetime.fromisoformat(reset['expires']) > datetime.now():
-                    valid_reset = reset
-                break
-        
-        if valid_reset:
-            # Update password
-            users = load_users()
-            for user in users:
-                if user['mobile'] == mobile:
-                    user['password'] = generate_password_hash(new_password)
-                    save_users(users)
-                    
-                    # Remove used reset token
-                    resets.remove(valid_reset)
-                    save_password_resets(resets)
-                    
-                    return redirect('/login')
-        
-        return render_template('reset_password.html', error="Invalid or expired reset token")
-    
-    return render_template('reset_password.html')
 
 @app.route('/customer_dashboard')
 def customer_dashboard():
+    # Get business_id from URL if scanned via QR
+    qr_business_id = request.args.get('business_id')
+    
+    if qr_business_id:
+        # Set business_id from QR in session
+        session['business_id'] = qr_business_id
+        print(f"Business ID set from QR: {qr_business_id}")
+    
+    # Business ID comes from session (either from QR or login)
+    if 'business_id' not in session:
+        return "Business ID is missing. Please scan the QR code again.", 400
+    
     return render_template('customer_dashboard.html')
+
 
 @app.route('/professional_dashboard')
 def professional_dashboard():
+    print("Accessing professional dashboard")
+    business_id = session.get('business_id')
+    print("Business ID from session:", business_id)
     if 'business_id' not in session:
         return redirect('/login')
-    return render_template('professional_dashboard.html', business_id=session['business_id'])
+    return render_template('professional_dashboard.html')
 
 @app.route('/logout')
 def logout():
@@ -215,13 +162,11 @@ def logout():
 # API to get queue data for a business
 @app.route('/api/queue')
 def get_queue():    
-    business_id = request.args.get('business_id')
-    if not business_id:
-        print("Business ID not provided")
-        print("Full URL:", request.url)
-        print("Args:", request.args)
-        return jsonify({"error": "Business ID required"}), 400
+    # Get business_id from session
+    if 'business_id' not in session:
+        return jsonify({"error": "Authentication required"}), 401
     
+    business_id = session['business_id']
     queue_data = load_queue()
     today = datetime.now().strftime("%Y-%m-%d")
     
@@ -234,10 +179,12 @@ def get_queue():
 # API to add new customer in queue
 @app.route('/api/queue/add', methods=['POST'])
 def add_to_queue():
+    # Get business_id from session
+    if 'business_id' not in session:
+        return jsonify({"error": "Authentication required"}), 401
+    
+    business_id = session['business_id']
     data = request.get_json()
-    business_id = request.args.get('business_id')    
-    if not business_id:
-        return jsonify({"error": "Business ID required"}), 400
     
     # Generate token ID
     token_id = generate_token_id(business_id)
@@ -269,11 +216,12 @@ def add_to_queue():
 # API to update queue token (mark complete or skip)
 @app.route('/api/queue/update', methods=['POST'])
 def update_queue():
-    data = request.get_json()
-    business_id = request.args.get('business_id')
+    # Get business_id from session
+    if 'business_id' not in session:
+        return jsonify({"error": "Authentication required"}), 401
     
-    if not business_id:
-        return jsonify({"error": "Business ID required"}), 400
+    business_id = session['business_id']
+    data = request.get_json()
     
     queue_data = load_queue()
     today = datetime.now().strftime("%Y-%m-%d")

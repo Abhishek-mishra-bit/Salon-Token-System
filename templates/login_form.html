@@ -6,7 +6,7 @@
     <title>Business Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
+         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -19,15 +19,16 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 15px;
         }
         
         .container {
-            max-width: 500px;
+            max-width: 100%;
             width: 100%;
+            max-width: 450px;
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -36,38 +37,52 @@
         .header {
             background: linear-gradient(to right, #1a2a6c, #b21f1f);
             color: white;
-            padding: 30px;
+            padding: 25px 20px;
             text-align: center;
             position: relative;
         }
         
         .header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
         }
         
         .header p {
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             opacity: 0.9;
         }
         
+        .logo {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
         .form-container {
-            padding: 30px;
+            padding: 25px;
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 20px;
         }
         
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 600;
             color: #1a2a6c;
-            font-size: 1.05rem;
+            font-size: 0.95rem;
         }
         
         .required::after {
@@ -81,9 +96,9 @@
         
         input, textarea, select {
             width: 100%;
-            padding: 15px 50px 15px 15px;
+            padding: 14px 45px 14px 15px;
             border: 2px solid #e1e5ee;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 16px;
             transition: all 0.3s ease;
             background: #f8f9fa;
@@ -98,6 +113,7 @@
         
         input::placeholder {
             color: #a0aec0;
+            font-size: 0.95rem;
         }
         
         .icon {
@@ -129,39 +145,44 @@
             background: linear-gradient(to right, #1a2a6c, #b21f1f);
             color: white;
             border: none;
-            border-radius: 10px;
-            padding: 16px;
-            font-size: 18px;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             width: 100%;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
             margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
         .submit-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
             background: linear-gradient(to right, #233380, #c72525);
         }
         
         .form-footer {
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             color: #718096;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             border-top: 1px solid #e1e5ee;
             background: #f8f9fa;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         
         .form-footer a {
             color: #1a2a6c;
             text-decoration: none;
             font-weight: 600;
+            font-size: 0.9rem;
         }
         
         .form-footer a:hover {
@@ -170,9 +191,10 @@
         
         .options {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            gap: 10px;
             margin-top: 10px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         
         .remember {
@@ -188,8 +210,10 @@
         .divider {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin: 20px 0;
+            gap: 12px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+            color: #718096;
         }
         
         .divider::before,
@@ -203,13 +227,13 @@
         .social-login {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-top: 15px;
+            gap: 15px;
+            margin-top: 10px;
         }
         
         .social-btn {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             border: none;
             background: #f1f5f9;
@@ -218,13 +242,13 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 20px;
+            font-size: 18px;
             color: #4a5568;
         }
         
         .social-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
         }
         
         .facebook { color: #1877f2; }
@@ -232,11 +256,12 @@
         .linkedin { color: #0a66c2; }
         
         .notification {
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
             display: none;
             text-align: center;
+            font-size: 0.9rem;
         }
         
         .success {
@@ -262,36 +287,59 @@
         }
         
         .mobile-input {
-            padding-left: 55px !important;
+            padding-left: 50px !important;
         }
         
-        .logo {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 28px;
-            background: rgba(255, 255, 255, 0.2);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* Mobile specific styles */
+        @media (max-width: 480px) {
+            .container {
+                border-radius: 12px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .logo {
+                top: 12px;
+                left: 12px;
+                font-size: 20px;
+                width: 40px;
+                height: 40px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+            
+            input, textarea, select {
+                padding: 12px 40px 12px 12px;
+                font-size: 15px;
+            }
+            
+            .country-code {
+                left: 12px;
+                font-size: 15px;
+            }
+            
+            .mobile-input {
+                padding-left: 45px !important;
+            }
+            
+            .social-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
         }
-        
-        /* Animation */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .form-group {
-            animation: fadeIn 0.5s ease forwards;
-        }
-        
         .form-group:nth-child(1) { animation-delay: 0.1s; }
         .form-group:nth-child(2) { animation-delay: 0.2s; }
         .submit-group { animation: fadeIn 0.3s ease forwards; }
+
     </style>
 </head>
 <body>
@@ -316,7 +364,7 @@
             <div class="form-group">
                 <label for="mobile" class="required">Mobile Number</label>
                 <div class="input-container">
-                    <span class="country-code">+1</span>
+                    <span class="country-code">+91</span>
                     <input type="tel" id="mobile" name="mobile" class="mobile-input" placeholder="Enter your mobile number" required>
                     <i class="fas fa-phone icon"></i>
                 </div>
